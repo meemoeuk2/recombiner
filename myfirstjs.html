@@ -1,0 +1,72 @@
+<!DOCTYPE = html>
+<html>
+<body>
+Piece Combiner v0.1
+<br>
+
+<canvas id="PCcanvas" width="400" height="600" 
+    style ="border:1px solid grey">
+</canvas>
+
+<script>
+
+"use strict";
+
+let nodeList = [];
+
+class Node{
+    // d = distance , ang = inherent angle
+    constructor(x,y,nearNode){
+        this.x=x;
+        this.y=y;
+        this.nearNodes = [];
+        if (nearNode!=null) this.nearNodes.push(nearNode);
+		nodeList.push(this);
+    }
+}
+
+function linkNodes(n,n2){
+ n.nearNodes.push(n2);
+ n2.nearNodes.push(n);
+}
+
+const canvas = document.getElementById("PCcanvas");
+const canvasDrawTools = canvas.getContext("2d");
+canvasDrawTools.fillStyle = 'blue';  // color black
+
+
+function createSquareOfNodes(w,h,x,y){
+// we've got to use the square geometry to do this quickly.
+// don't be adverse to using good ol' geometry;
+ let na = [] ;
+ let k=0; // array size counter
+ 
+ let n = null;
+ 
+ for (let i=0;i<w*10;i=i+10){
+  for (let j=0;j<h*10;j=j+10){
+   n = new Node(i+x,j+y);
+   na.push(n);
+   k++;
+   linkNodes(n,na[k-1]);
+   if (k>9) linkNodes(n,na[k-10]);
+  }
+ } 
+ 
+}
+
+
+
+function displayNodes(){
+ // get each node and draw it to the canvas
+ nodeList.forEach( (node) => canvasDrawTools.fillRect(node.x,node.y,2,2) );
+
+}
+
+
+
+</script>
+
+</body>
+</html>
+    
