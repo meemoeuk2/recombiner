@@ -1,0 +1,105 @@
+<!DOCTYPE = html>
+<html>
+<head>
+ <title>Recombiner</title>
+</head>
+<body>
+Piece Recombiner v0.1
+<br>
+
+<canvas id="PCcanvas" width="400" height="600" 
+    style ="border:1px solid grey">
+</canvas>
+
+<script>
+
+"use strict";
+
+class Region{
+ // a locally spacial group of nodes
+ nodelist=[];
+ xp=0.0; // pivot for rotation and contraction
+ yp=0.0; 
+ 
+ getMiddleNode(){
+ 
+  let x=0.0;
+  let y=0.0;
+ 
+  for (let i=0;i<this.nodelist.length;i++){
+   x = x+this.nodelist[i].x;
+   y = y+this.nodelist[i].y;
+  }
+  this.xp=x/this.nodelist.length;
+  this.yp=y/this.nodelist.length;
+ }
+ 
+} // end class Region
+
+
+class Node{
+    // d = distance , ang = inherent angle
+    constructor(x,y,nearNode){
+        this.x=x;
+        this.y=y;
+        this.nearNodes = [];
+        if (nearNode!=null) this.nearNodes.push(nearNode);
+		regionWorld.nodelist.push(this);
+    }
+}
+
+
+function linkNodes(n,n2){
+ n.nearNodes.push(n2);
+ n2.nearNodes.push(n);
+}
+
+
+
+function createRectOfNodes(w,h,x,y,ang){
+ let na = [] ; // need a local array to help with the node intra-links
+ let k=0; // ... and a counter.
+ 
+ let n = null;
+ 
+ for (let i=0;i<w*10;i=i+10){
+  for (let j=0;j<h*10;j=j+10){
+   n = new Node(i*Math.cos(ang)-j*Math.sin(ang)+x,j*Math.cos(ang)+y+i*Math.sin(ang));
+   na.push(n);
+   if (k%h!=0) linkNodes(n,na[k-1]);
+   if (k>=h  ) linkNodes(n,na[k-h]);
+   k++;
+  }
+ } 
+ 
+}
+
+
+
+function grabAllNodesForRegionWorld(){
+  
+}
+
+
+function displayNodes(){
+ // get each node and draw it to the canvas
+ regionWorld.nodelist.forEach( (node) => canvasDrawTools.fillRect(node.x,node.y,2,2) );
+
+}
+
+// init code
+const canvas = document.getElementById("PCcanvas");
+const canvasDrawTools = canvas.getContext("2d");
+canvasDrawTools.fillStyle = 'blue';  // color black
+const regionWorld = new Region();
+
+createRectOfNodes(10,10,100,100,0);
+displayNodes();
+
+
+
+
+</script>
+
+</body>
+</html>
