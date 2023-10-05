@@ -17,11 +17,19 @@ Piece Recombiner v0.1
 
 class Region{
  // a locally spacial group of nodes
+
  nodelist=[];
  xp=0.0; // pivot for rotation and contraction
  yp=0.0; 
  
- getMiddleNode(){
+ 
+ setPivot(x,y){
+  this.xp=x;
+  this.yp=y;
+  }
+ 
+ 
+ getMiddleCoord(){
  
   let x=0.0;
   let y=0.0;
@@ -34,26 +42,82 @@ class Region{
   this.yp=y/this.nodelist.length;
  }
  
+ 
+ rotate_d(ang){ // in degrees
+  ang = ang*Math.PI / 180.0;
+  let cang = Math.cos(ang);
+  let sang = Math.sin(ang);
+  console.log(cang+' '+sang);
+  this.nodelist.forEach( (n) => n.rotate(sang,cang) );
+ }
+ 
+ 
+ getAllAbsCoords() {this.nodelist.forEach ( (n) => this.getAbsCoords(n) ) }
+ 
+ 
+ getAbsCoords(n){ // for a Node
+  n.x = n.xr + this.xp;
+  n.y = n.yr + this.yp;
+ }
+ 
+ 
+ getAllPolarCoords(){
+  this.nodelist.forEach( (n) => this.getPolarCoords(n) );
+ }
+ 
+ 
+ getPolarCoords(n){
+  // right is theta = 0 
+  n.r     = (n.x-this.xp)*(n.x-this.xp)+(n.y-this.yp)*(n.y-this.yp);
+  n.theta = Math.atan((n.y-this.yp)/(n.x-this.xp)); 
+  // might need to do own defintion of inverse-tan here.
+  // atan cannot convert from ratio to angle over 0<x<360 because info is lost in the ratio. Needs two variables.
+ }
+ 
+ 
+ getAllRelativeCoords(){
+  this.nodelist.forEach( (n) => this.getRelativeCoords(n) );
+ }
+ 
+ 
+ getRelativeCoords(n){ // relative to the pivot
+  n.xr = n.x-this.xp;
+  n.yr = n.y-this.yp; 
+ }
+ 
 } // end class Region
 
 
 class Node{
     // d = distance , ang = inherent angle
-    constructor(x,y,nearNode){
+ constructor(x,y,nearNode){
         this.x=x;
         this.y=y;
+		this.theta=0.0; //polar
+		this.r=0.0;
+		this.xr=0.0; // relative to pivot
+		this.yr=0.0;
         this.nearNodes = [];
         if (nearNode!=null) this.nearNodes.push(nearNode);
 		regionWorld.nodelist.push(this);
-    }
-}
+  }
+
+ rotate(sang,cang){
+ 
+  let xr2=this.xr
+//  console.log('rotate vertex '+this.xr+' '+this.yr+' by angle '+sang+' '+cang);
+  this.xr= this.xr*cang-this.yr*sang;
+  this.yr= this.yr*cang+xr2*sang;
+//  console.log('results in vertex '+this.xr+' '+this.yr);
+ }
+	
+} // end of node class
 
 
 function linkNodes(n,n2){
  n.nearNodes.push(n2);
  n2.nearNodes.push(n);
 }
-
 
 
 function createRectOfNodes(w,h,x,y,ang){
@@ -95,6 +159,9 @@ const regionWorld = new Region();
 
 createRectOfNodes(10,10,100,100,0);
 displayNodes();
+regionWorld.getMiddleCoord();
+regionWorld.getAllPolarCoords();
+regionWorld.getAllRelativeCoords();
 
 
 
