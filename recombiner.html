@@ -43,16 +43,7 @@ class Region{
  }
  
  
- rotate_d(ang){ // in degrees
-  ang = ang*Math.PI / 180.0;
-  let cang = Math.cos(ang);
-  let sang = Math.sin(ang);
-  console.log(cang+' '+sang);
-  this.nodelist.forEach( (n) => n.rotate(sang,cang) );
- }
- 
- 
- getAllAbsCoords() {this.nodelist.forEach ( (n) => this.getAbsCoords(n) ) }
+ getAllAbsCoords() { this.nodelist.forEach ( (n) => this.getAbsCoords(n) ); }
  
  
  getAbsCoords(n){ // for a Node
@@ -84,6 +75,42 @@ class Region{
   n.xr = n.x-this.xp;
   n.yr = n.y-this.yp; 
  }
+ 
+ 
+ scale(s){ // scale region
+  this.nodelist.forEach( (n) => {
+   n.xr = n.xr*s;
+   n.yr = n.yr*s;
+   this.getAbsCoords(n);
+  })
+  
+  return this;
+ }
+ 
+ 
+ move(x,y){ // move Region
+  this.nodelist.forEach( (n) => {
+   n.x = n.x+x;
+   n.y = n.y+y;
+  })
+  this.xp=this.xp+x;
+  this.yp=this.yp+y;
+  
+  return this;
+ }
+ 
+ 
+ rotate_d(ang){ // in degrees
+  ang = ang*Math.PI / 180.0;
+  let cang = Math.cos(ang);
+  let sang = Math.sin(ang);
+  console.log(cang+' '+sang);
+  this.nodelist.forEach( (n) => n.rotate(sang,cang) );
+  
+  return this;
+ }
+ 
+ 
  
 } // end class Region
 
@@ -148,8 +175,10 @@ function grabAllNodesForRegionWorld(){
 function displayNodes(){
  // get each node and draw it to the canvas
  regionWorld.nodelist.forEach( (node) => canvasDrawTools.fillRect(node.x,node.y,2,2) );
-
 }
+
+function clearCanvas(){ canvasDrawTools.clearRect(0,0,canvas.width,canvas.height); }
+function redraw() { clearCanvas(); displayNodes(); }
 
 // init code
 const canvas = document.getElementById("PCcanvas");
